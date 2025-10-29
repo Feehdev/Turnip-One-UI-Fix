@@ -1,0 +1,47 @@
+name: Build Turnip Driver
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-turnip:
+    runs-on: ubuntu-latest
+    env:
+      MESON_BUILD_DIR: build
+
+    steps:
+      # 1️⃣ Checkout do repositório (seu fork já com alterações)
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      # 2️⃣ Instalar dependências
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential meson ninja-build libdrm-dev libexpat1-dev \
+          libx11-dev libxext-dev libxdamage-dev libxfixes-dev libxcb1-dev libxcb-dri2-0-dev \
+          libxcb-dri3-dev libxcb-glx0-dev libxcb-present-dev python3-mako python3-pip
+
+      # 3️⃣ Configurar Meson para build
+      - name: Configure build
+        run: |
+          mkdir -p $MESON_BUILD_DIR
+          cd $MESON_BUILD_DIR
+          meson setup --prefix=/usr \
+                      -Dgallium-drivers=turnip \
+                      -Dvulkan-drivers=freedreno \
+                      -Dbuildtype=release ..
+
+      # 4️⃣ Compilar
+      - name: Compile Turnip
+        run: ninja -C $MESON_BUILD_DIR
+
+      # 5️⃣ Fazer upload do build como artefato
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: turnip-driver
+          path: $MESON_BUILD_DIR

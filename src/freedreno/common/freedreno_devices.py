@@ -947,7 +947,7 @@ a7xx_gen2 = A7XXProps(
         fs_must_have_non_zero_constlen_quirk = True,
         # Most devices with a740 have blob v6xx which doesn't have
         # this hint set. Match them for better compatibility by default.
-        enable_tp_ubwc_flag_hint = False,
+        enable_tp_ubwc_flag_hint = True,
         has_64b_ssbo_atomics = True,
         has_primitive_shading_rate = True,
         reading_shading_rate_requires_smask_quirk = True,
