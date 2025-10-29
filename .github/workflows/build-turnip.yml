@@ -1,4 +1,4 @@
-name: Build Turnip Driver (Patched & Fast)
+name: Build Turnip Driver (Final & Patched)
 
 on:
   push:
@@ -13,7 +13,7 @@ jobs:
       MESON_BUILD_DIR: build
 
     steps:
-      # 1️⃣ Checkout do repositório (fork com as alterações)
+      # 1️⃣ Checkout do repositório (fork com alterações)
       - name: Checkout repo
         uses: actions/checkout@v4
 
@@ -52,7 +52,7 @@ jobs:
             --prefix=/usr \
             --buildtype=release \
             -Dvulkan-drivers=freedreno \
-            -Dplatforms=drm \
+            -Dplatforms=auto \
             -Dglx=disabled \
             -Dgles1=disabled \
             -Dgles2=disabled \
