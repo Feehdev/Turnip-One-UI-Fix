@@ -6,11 +6,6 @@ on:
       - main
   workflow_dispatch:
 
-name: Upgrade Meson
-  run: |
-    pip install --upgrade meson
-
-
 jobs:
   build-turnip:
     runs-on: ubuntu-latest
@@ -18,19 +13,22 @@ jobs:
       MESON_BUILD_DIR: build
 
     steps:
-      # 1️⃣ Checkout do repositório (seu fork já com alterações)
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      # 2️⃣ Instalar dependências
+    
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y build-essential meson ninja-build libdrm-dev libexpat1-dev \
+          sudo apt install -y build-essential python3-pip ninja-build libdrm-dev libexpat1-dev \
           libx11-dev libxext-dev libxdamage-dev libxfixes-dev libxcb1-dev libxcb-dri2-0-dev \
-          libxcb-dri3-dev libxcb-glx0-dev libxcb-present-dev python3-mako python3-pip
+          libxcb-dri3-dev libxcb-glx0-dev libxcb-present-dev python3-mako
 
-      # 3️⃣ Configurar Meson para build
+      - name: Upgrade Meson and build tools
+        run: |
+          pip install --upgrade pip setuptools wheel ninja
+          pip install meson==1.4.1
+
       - name: Configure build
         run: |
           mkdir -p $MESON_BUILD_DIR
@@ -40,13 +38,11 @@ jobs:
                       -Dvulkan-drivers=freedreno \
                       -Dbuildtype=release ..
 
-      # 4️⃣ Compilar
       - name: Compile Turnip
         run: ninja -C $MESON_BUILD_DIR
 
-      # 5️⃣ Fazer upload do build como artefato
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: turnip-driver
-          path: $MESON_BUILD_DIR
+          path: ${{ env.MESON_BUILD_DIR }}
