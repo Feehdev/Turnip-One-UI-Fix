@@ -13,34 +13,39 @@ jobs:
       MESON_BUILD_DIR: build
 
     steps:
+      # 1️⃣ Checkout do repositório (seu fork já com alterações)
       - name: Checkout repo
         uses: actions/checkout@v4
 
-    
+      # 2️⃣ Instalar dependências básicas
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y build-essential python3-pip ninja-build libdrm-dev libexpat1-dev \
-          libx11-dev libxext-dev libxdamage-dev libxfixes-dev libxcb1-dev libxcb-dri2-0-dev \
-          libxcb-dri3-dev libxcb-glx0-dev libxcb-present-dev python3-mako
+          sudo apt install -y build-essential python3-pip ninja-build git pkg-config \
+          libdrm-dev libexpat1-dev libx11-dev libxext-dev libxdamage-dev libxfixes-dev \
+          libxcb1-dev libxcb-dri2-0-dev libxcb-dri3-dev libxcb-glx0-dev libxcb-present-dev \
+          python3-mako
 
+      # 3️⃣ Atualizar ferramentas de build (Meson 1.4+ e Ninja)
       - name: Upgrade Meson and build tools
         run: |
           pip install --upgrade pip setuptools wheel ninja
           pip install meson==1.4.1
 
+      # 4️⃣ Configurar Meson para build do Turnip
       - name: Configure build
         run: |
           mkdir -p $MESON_BUILD_DIR
           cd $MESON_BUILD_DIR
           meson setup --prefix=/usr \
-                      -Dgallium-drivers=turnip \
                       -Dvulkan-drivers=freedreno \
                       -Dbuildtype=release ..
 
+      # 5️⃣ Compilar Turnip
       - name: Compile Turnip
         run: ninja -C $MESON_BUILD_DIR
 
+      # 6️⃣ Fazer upload do build como artefato
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
