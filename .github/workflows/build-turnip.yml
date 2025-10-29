@@ -6,6 +6,11 @@ on:
       - main
   workflow_dispatch:
 
+name: Upgrade Meson
+  run: |
+    pip install --upgrade meson
+
+
 jobs:
   build-turnip:
     runs-on: ubuntu-latest
