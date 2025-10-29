@@ -1,4 +1,4 @@
-name: Build Turnip Driver (Final & Patched)
+name: Build Turnip Driver (Modern & Patched)
 
 on:
   push:
@@ -14,7 +14,7 @@ jobs:
 
     steps:
       # 1️⃣ Checkout do repositório (fork com alterações)
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       # 2️⃣ Instalar dependências essenciais
@@ -25,7 +25,7 @@ jobs:
           python3-mako glslang-tools libdrm-dev libexpat1-dev llvm-dev libxcb1-dev \
           libxcb-dri2-0-dev libxcb-dri3-dev libxcb-present-dev libxcb-xfixes0-dev
 
-      # 3️⃣ Atualizar ferramentas de build
+      # 3️⃣ Atualizar ferramentas de build (Meson 1.4.1+ e Ninja)
       - name: Upgrade Meson and build tools
         run: |
           pip install --upgrade pip setuptools wheel ninja
@@ -43,7 +43,7 @@ jobs:
           fi
           grep -n "enable_tp_ubwc_flag_hint" "$FILE" || true
 
-      # 5️⃣ Configurar Meson para build apenas do Turnip Vulkan (freedreno)
+      # 5️⃣ Configurar Meson (build rápido Vulkan-only, flags modernas)
       - name: Configure build
         run: |
           mkdir -p $MESON_BUILD_DIR
@@ -57,7 +57,7 @@ jobs:
             -Dgles1=disabled \
             -Dgles2=disabled \
             -Dopengl=false \
-            -Dshared-glapi=false \
+            -Dshared-glapi=disabled \
             -Dgbm=disabled \
             -Dllvm=enabled \
             -Dvalgrind=disabled \
@@ -67,9 +67,4 @@ jobs:
       - name: Compile Turnip
         run: ninja -C $MESON_BUILD_DIR
 
-      # 7️⃣ Fazer upload do artefato compilado
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: turnip-driver-patched
-          path: ${{ env.MESON_BUILD_DIR }}
+      # 7️⃣ Fazer upload do artefato comp
